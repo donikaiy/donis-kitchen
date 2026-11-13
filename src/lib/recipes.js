@@ -89,7 +89,7 @@ function toRecipe(path, src) {
     slug,
     title: data.title ?? slug,
     description: data.description ?? '',
-    image: data.image || placeholder(category),
+    image: data.image ? withBase(data.image) : placeholder(category),
     source: data.source ?? '',
     category,
     prep,
@@ -128,6 +128,13 @@ export const RECIPES = Object.entries(files)
   .sort((a, b) => a.title.localeCompare(b.title, 'bg'))
 
 export const getRecipe = slug => RECIPES.find(r => r.slug === slug)
+
+// Локалните снимки (/snimka.webp от public/) трябва да минат през base пътя —
+// в GitHub Pages сайтът е под /donis-kitchen/, а не в корена.
+function withBase(url) {
+  if (!url.startsWith('/') || url.startsWith('//')) return url
+  return import.meta.env.BASE_URL + url.slice(1)
+}
 
 export function img(url, w) {
   if (!url.includes('images.unsplash.com')) return url
